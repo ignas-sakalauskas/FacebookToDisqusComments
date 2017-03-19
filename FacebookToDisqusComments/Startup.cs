@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using FacebookToDisqusComments.ApiWrappers;
 
 namespace FacebookToDisqusComments
 {
@@ -47,6 +48,11 @@ namespace FacebookToDisqusComments
                 }
 
                 return ReturnCodes.Success;
+            }
+            catch (FacebookApiException ex)
+            {
+                Console.WriteLine($"Facebook API error occurred: {ex.Message}");
+                return ReturnCodes.UnexpectedError;
             }
             catch (Exception ex)
             {
