@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookToDisqusComments", "FacebookToDisqusComments\FacebookToDisqusComments.csproj", "{421153BF-BC78-4286-9F6A-8E6E4B56BFC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookToDisqusComments.Tests", "FacebookToDisqusComments.Tests\FacebookToDisqusComments.Tests.csproj", "{51F28A9E-4266-41C6-862F-96A47A9BC2C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{421153BF-BC78-4286-9F6A-8E6E4B56BFC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{421153BF-BC78-4286-9F6A-8E6E4B56BFC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{421153BF-BC78-4286-9F6A-8E6E4B56BFC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{421153BF-BC78-4286-9F6A-8E6E4B56BFC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51F28A9E-4266-41C6-862F-96A47A9BC2C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51F28A9E-4266-41C6-862F-96A47A9BC2C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51F28A9E-4266-41C6-862F-96A47A9BC2C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51F28A9E-4266-41C6-862F-96A47A9BC2C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
