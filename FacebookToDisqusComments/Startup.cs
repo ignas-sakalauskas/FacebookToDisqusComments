@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
-using FacebookToDisqusComments.DisqusComments;
 
 namespace FacebookToDisqusComments
 {
@@ -21,18 +20,24 @@ namespace FacebookToDisqusComments
             _fileUtils = fileUtils ?? throw new ArgumentNullException(nameof(fileUtils));
         }
 
-        public async Task Run()
+        public async Task<ReturnCodes> Run()
         {
             try
             {
                 var accessToken = await _facebookApi.GetAccessToken(_settings.AppId, _settings.AppSecret);
+                if (string.IsNullOrWhiteSpace(accessToken))
+                {
+                    Console.WriteLine($"Error. Access token was not retrieved.");
+                    return ReturnCodes.AccessTokenError;
+                }
+
                 Console.WriteLine($"Access token retrieved.");
 
                 var pageItems = _fileUtils.LoadCommentsPageInfo(_settings.InputFilePath);
                 foreach (var page in pageItems)
                 {
                     var comments = await _facebookApi.GetPageComments(accessToken, page.FacebookPageId);
-                    Console.WriteLine($"Page '{page.TargetPageTitle}', count of comments retrieved: {comments.Count}");
+                    Console.WriteLine($"Page '{page.TargetPageTitle}', comments count: {comments.Count}");
 
                     var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl.ToString(), page.TargetPageId);
 
@@ -41,12 +46,12 @@ namespace FacebookToDisqusComments
                     Console.WriteLine($"Disqus comments saved into: {filePath}");
                 }
 
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
+                return ReturnCodes.Success;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error executing application: {ex.Message}");
+                Console.WriteLine($"Unexpected error occurred: {ex.Message}");
+                return ReturnCodes.UnexpectedError;
             }
         }
     }

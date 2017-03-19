@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml.Linq;
 
-namespace FacebookToDisqusComments.DisqusComments
+namespace FacebookToDisqusComments
 {
     public class DisqusCommentsFormatter : IDisqusCommentsFormatter
     {

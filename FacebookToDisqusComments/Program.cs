@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using FacebookToDisqusComments.DisqusComments;
+using System;
 
 namespace FacebookToDisqusComments
 {
@@ -25,6 +25,9 @@ namespace FacebookToDisqusComments
 
             // Entry point, async
             Task.Run(async () => await app.Run()).Wait();
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
 
         private static void ConfigureServices(IServiceCollection services)
