@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System;
+using System.Net.Http;
 
 namespace FacebookToDisqusComments
 {
@@ -24,8 +25,10 @@ namespace FacebookToDisqusComments
             var app = serviceProvider.GetService<Startup>();
 
             // Entry point, async
-            Task.Run(async () => await app.Run()).Wait();
+            var returnCode = 0;
+            Task.Run(async () => { returnCode = (int) await app.Run(); }).Wait();
 
+            Console.WriteLine($"Application has finished with code: {returnCode}");
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
         }
@@ -42,6 +45,7 @@ namespace FacebookToDisqusComments
             services.AddSingleton<IFacebookCommentsApiWrapper, FacebookCommentsApiWrapper>();
             services.AddSingleton<IDisqusCommentsFormatter, DisqusCommentsFormatter>();
             services.AddSingleton<IFileUtils, FileUtils>();
+            services.AddTransient<Func<HttpClient>>(_ => () => new HttpClient());
         }
     }
 }
