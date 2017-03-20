@@ -51,25 +51,35 @@ namespace FacebookToDisqusComments
 
         public async Task<IList<FacebookComment>> GetPageComments(string accessToken, string pageId)
         {
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                throw new ArgumentNullException(nameof(accessToken));
+            }
+
+            if (string.IsNullOrWhiteSpace(pageId))
+            {
+                throw new ArgumentNullException(nameof(pageId));
+            }
+
             using (var client = _httpClientFactory())
             {
                 var uri = new Uri($"https://graph.facebook.com/comments?id={pageId}&access_token={accessToken}");
 
                 var response = await client.GetAsync(uri);
-                if (response == null)
+                if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception("change with smart excep");
+                    throw new FacebookApiException("Http client response was not successful.");
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-
-                var commentsPage = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookCommentsPage>(content);
-                if (commentsPage == null)
+                if (string.IsNullOrWhiteSpace(content))
                 {
-                    throw new Exception(" no auth token, change with smart excep");
+                    throw new FacebookApiException("Http client response is empty.");
                 }
 
-                return commentsPage.Comments;
+                var commentsPage = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookCommentsPage>(content);
+
+                return commentsPage?.Comments ?? new List<FacebookComment>();
             }
         }
     }
