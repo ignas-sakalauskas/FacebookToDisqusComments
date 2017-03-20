@@ -5,6 +5,8 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using FluentAssertions;
 using System.Threading.Tasks;
+using FacebookToDisqusComments.ApiWrappers;
+using FacebookToDisqusComments.DataServices;
 
 namespace FacebookToDisqusComments.Tests
 {
@@ -30,6 +32,7 @@ namespace FacebookToDisqusComments.Tests
         public void Constructor_ThrowsArgumentNullException_WhenSettingsIsNull()
         {
             // Arrange & Act
+            // ReSharper disable once ObjectCreationAsStatement
             Action action = () => new Startup(null, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Assert
@@ -43,6 +46,7 @@ namespace FacebookToDisqusComments.Tests
             _settings.Value.Returns(null as AppSettings);
 
             // Act
+            // ReSharper disable once ObjectCreationAsStatement
             Action action = () => new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Assert
@@ -53,6 +57,7 @@ namespace FacebookToDisqusComments.Tests
         public void Constructor_ThrowsArgumentNullException_WhenFacebookApiWrapperIsNull()
         {
             // Arrange & Act
+            // ReSharper disable once ObjectCreationAsStatement
             Action action = () => new Startup(_settings, null, _disqusFormatter, _fileUtils);
 
             // Assert
@@ -63,6 +68,7 @@ namespace FacebookToDisqusComments.Tests
         public void Constructor_ThrowsArgumentNullException_WhenDisqusCommentsFormatterIsNull()
         {
             // Arrange & Act
+            // ReSharper disable once ObjectCreationAsStatement
             Action action = () => new Startup(_settings, _facebookApi, null, _fileUtils);
 
             // Assert
@@ -73,6 +79,7 @@ namespace FacebookToDisqusComments.Tests
         public void Constructor_ThrowsArgumentNullException_WhenFileUtilsIsNull()
         {
             // Arrange & Act
+            // ReSharper disable once ObjectCreationAsStatement
             Action action = () => new Startup(_settings, _facebookApi, _disqusFormatter, null);
 
             // Assert

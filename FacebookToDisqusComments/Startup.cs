@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers;
+using FacebookToDisqusComments.DataServices;
 
 namespace FacebookToDisqusComments
 {
@@ -28,11 +29,11 @@ namespace FacebookToDisqusComments
                 var accessToken = await _facebookApi.GetAccessToken(_settings.AppId, _settings.AppSecret);
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
-                    Console.WriteLine($"Error. Access token was not retrieved.");
+                    Console.WriteLine("Error. Access token was not retrieved.");
                     return ReturnCodes.AccessTokenError;
                 }
 
-                Console.WriteLine($"Access token retrieved.");
+                Console.WriteLine("Access token retrieved.");
 
                 var pageItems = _fileUtils.LoadCommentsPageInfo(_settings.InputFilePath);
                 foreach (var page in pageItems)

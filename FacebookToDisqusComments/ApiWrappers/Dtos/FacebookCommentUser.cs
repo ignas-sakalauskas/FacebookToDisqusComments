@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.ApiWrappers.Dtos
 {
     public class FacebookCommentUser
     {

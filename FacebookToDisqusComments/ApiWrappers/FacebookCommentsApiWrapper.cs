@@ -1,10 +1,10 @@
-﻿using FacebookToDisqusComments.ApiWrappers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FacebookToDisqusComments.ApiWrappers.Dtos;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.ApiWrappers
 {
     public class FacebookCommentsApiWrapper : IFacebookCommentsApiWrapper
     {
@@ -17,7 +17,7 @@ namespace FacebookToDisqusComments
 
         public async Task<string> GetAccessToken(string appId, string appSecret)
         {
-            const string AccessTokenKey = "access_token=";
+            const string accessTokenKey = "access_token=";
 
             if (string.IsNullOrWhiteSpace(appId))
             {
@@ -40,12 +40,12 @@ namespace FacebookToDisqusComments
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-                if (!content.Contains(AccessTokenKey))
+                if (!content.Contains(accessTokenKey))
                 {
                     throw new FacebookApiException("Http client response doesn't contain access token.");
                 }
 
-                return content.Replace(AccessTokenKey, string.Empty);
+                return content.Replace(accessTokenKey, string.Empty);
             }
         }
 

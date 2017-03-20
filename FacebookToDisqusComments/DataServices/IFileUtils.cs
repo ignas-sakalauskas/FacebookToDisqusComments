@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using FacebookToDisqusComments.DataServices.Dtos;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.DataServices
 {
     public interface IFileUtils
     {

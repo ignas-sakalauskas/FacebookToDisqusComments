@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using FacebookToDisqusComments.ApiWrappers.Dtos;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.ApiWrappers
 {
     public interface IFacebookCommentsApiWrapper
     {

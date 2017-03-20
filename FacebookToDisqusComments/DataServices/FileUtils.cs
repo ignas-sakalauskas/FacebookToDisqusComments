@@ -1,10 +1,10 @@
-﻿using FacebookToDisqusComments.DataServices.Dtos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
+using FacebookToDisqusComments.DataServices.Dtos;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.DataServices
 {
     public class FileUtils : IFileUtils
     {

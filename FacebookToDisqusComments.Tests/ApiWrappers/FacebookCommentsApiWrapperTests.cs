@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FacebookToDisqusComments.ApiWrappers.Dtos;
 
 namespace FacebookToDisqusComments.Tests.ApiWrappers
 {
@@ -233,7 +234,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             result.ShouldBeEquivalentTo(expectedList);
         }
 
-        private string GetFakeCommentsJson()
+        private static string GetFakeCommentsJson()
         {
             return @"
                 {
@@ -256,7 +257,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             ";
         }
 
-        private IList<FacebookComment> GetFakeCommentsList()
+        private static IList<FacebookComment> GetFakeCommentsList()
         {
             var comment = new FacebookComment
             {

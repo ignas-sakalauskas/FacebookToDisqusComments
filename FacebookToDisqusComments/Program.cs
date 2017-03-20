@@ -4,19 +4,21 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System;
 using System.Net.Http;
+using FacebookToDisqusComments.ApiWrappers;
+using FacebookToDisqusComments.DataServices;
 
 namespace FacebookToDisqusComments
 {
-    class Program
+    public class Program
     {
-        private static IConfigurationRoot Configuration;
+        private static IConfigurationRoot _configuration;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
-            Configuration = builder.Build();
+            _configuration = builder.Build();
 
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
@@ -37,10 +39,10 @@ namespace FacebookToDisqusComments
         {
             // Options
             services.AddOptions();
-            services.Configure<AppSettings>(Configuration.GetSection("appSettings"));
+            services.Configure<AppSettings>(_configuration.GetSection("appSettings"));
 
             // DI
-            services.AddSingleton(Configuration);
+            services.AddSingleton(_configuration);
             services.AddSingleton<Startup>();
             services.AddSingleton<IFacebookCommentsApiWrapper, FacebookCommentsApiWrapper>();
             services.AddSingleton<IDisqusCommentsFormatter, DisqusCommentsFormatter>();

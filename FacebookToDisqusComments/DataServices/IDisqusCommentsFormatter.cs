@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
+using FacebookToDisqusComments.ApiWrappers.Dtos;
 
-namespace FacebookToDisqusComments
+namespace FacebookToDisqusComments.DataServices
 {
     public interface IDisqusCommentsFormatter
     {
