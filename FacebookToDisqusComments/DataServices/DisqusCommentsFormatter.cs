@@ -34,7 +34,7 @@ namespace FacebookToDisqusComments.DataServices
             return doc;
         }
 
-        public IList<XElement> CreateCommentsList(IEnumerable<FacebookComment> comments)
+        public IEnumerable<XElement> CreateCommentsList(IEnumerable<FacebookComment> comments)
         {
             var list = new List<XElement>();
 

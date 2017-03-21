@@ -6,6 +6,6 @@ namespace FacebookToDisqusComments.ApiWrappers.Dtos
     public class FacebookCommentsPage
     {
         [JsonProperty("data")]
-        public IList<FacebookComment> Comments { get; set; }
+        public IEnumerable<FacebookComment> Comments { get; set; }
     }
 }

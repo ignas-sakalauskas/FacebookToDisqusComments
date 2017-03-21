@@ -6,7 +6,7 @@ namespace FacebookToDisqusComments.DataServices
 {
     public interface IFileUtils
     {
-        IList<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath);
+        IEnumerable<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath);
         void SaveAsXml(XDocument disqusCommentsXml, string fileName);
     }
 }

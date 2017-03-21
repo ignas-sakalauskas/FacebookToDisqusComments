@@ -39,7 +39,7 @@ namespace FacebookToDisqusComments
                 foreach (var page in pageItems)
                 {
                     var comments = await _facebookApi.GetPageComments(accessToken, page.FacebookPageId);
-                    Console.WriteLine($"Page '{page.TargetPageTitle}', comments count: {comments.Count}");
+                    Console.WriteLine($"Page '{page.TargetPageTitle}'");
 
                     var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl.ToString(), page.TargetPageId);
 

@@ -257,7 +257,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             ";
         }
 
-        private static IList<FacebookComment> GetFakeCommentsList()
+        private static IEnumerable<FacebookComment> GetFakeCommentsList()
         {
             var comment = new FacebookComment
             {
