@@ -7,6 +7,6 @@ namespace FacebookToDisqusComments.ApiWrappers
     public interface IFacebookCommentsApiWrapper
     {
         Task<string> GetAccessToken(string appId, string appSecret);
-        Task<IEnumerable<FacebookComment>> GetPageComments(string accessToken, string pageId);
+        Task<IList<FacebookComment>> GetPageComments(string accessToken, string pageId);
     }
 }

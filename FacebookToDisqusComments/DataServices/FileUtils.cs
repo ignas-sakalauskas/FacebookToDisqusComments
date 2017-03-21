@@ -14,7 +14,7 @@ namespace FacebookToDisqusComments.DataServices
         /// </summary>
         /// <param name="inputFilePath">Path to the file with input data</param>
         /// <returns>List of CommentsPageInfo objects.</returns>
-        public IEnumerable<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath)
+        public IList<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath)
         {
             var result = new List<CommentsPageInfo>();
 

@@ -50,7 +50,7 @@ namespace FacebookToDisqusComments.ApiWrappers
         }
 
         // TODO add children comments population - refer to the POC implementation
-        public async Task<IEnumerable<FacebookComment>> GetPageComments(string accessToken, string pageId)
+        public async Task<IList<FacebookComment>> GetPageComments(string accessToken, string pageId)
         {
             if (string.IsNullOrWhiteSpace(accessToken))
             {

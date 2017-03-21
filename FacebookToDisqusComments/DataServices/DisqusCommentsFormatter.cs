@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
 
@@ -6,7 +7,7 @@ namespace FacebookToDisqusComments.DataServices
 {
     public class DisqusCommentsFormatter : IDisqusCommentsFormatter
     {
-        public XDocument ConvertCommentsIntoXml(IEnumerable<FacebookComment> comments, string pageTitle, string pageUrl, string pageId)
+        public XDocument ConvertCommentsIntoXml(IList<FacebookComment> comments, string pageTitle, string pageUrl, string pageId)
         {
             XNamespace content = "http://purl.org/rss/1.0/modules/content/";
             XNamespace dsq = "http://www.disqus.com/";
@@ -34,8 +35,13 @@ namespace FacebookToDisqusComments.DataServices
             return doc;
         }
 
-        public IEnumerable<XElement> CreateCommentsList(IEnumerable<FacebookComment> comments)
+        public IList<XElement> CreateCommentsList(IList<FacebookComment> comments)
         {
+            if (comments == null)
+            {
+                throw new ArgumentNullException(nameof(comments));
+            }
+
             var list = new List<XElement>();
 
             foreach (var comment in comments)
@@ -55,8 +61,13 @@ namespace FacebookToDisqusComments.DataServices
             return list;
         }
 
-        public XElement CreateComment(FacebookComment comment, string parentId)
+        public XElement CreateComment(FacebookComment comment, string parentId = "0")
         {
+            if (comment == null)
+            {
+                throw new ArgumentNullException(nameof(comment));
+            }
+
             XNamespace wp = "http://wordpress.org/export/1.0/";
 
             var commentElement = new XElement(wp + "comment",
