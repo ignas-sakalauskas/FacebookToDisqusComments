@@ -51,7 +51,7 @@ namespace FacebookToDisqusComments.Tests.DataServices
                     Message = string.Empty,
                     Children = null,
                     From = new FacebookCommentUser()
-                }   
+                }
             };
 
             var formatter = new DisqusCommentsFormatter();
@@ -143,6 +143,52 @@ namespace FacebookToDisqusComments.Tests.DataServices
             result.Descendants(_wp + "comment_date_gmt").FirstOrDefault().Value.Should().Be("2017-03-21 00:03:00");
             result.Descendants(_wp + "comment_approved").FirstOrDefault().Value.Should().Be("1");
 
+        }
+
+        [TestMethod]
+        public void ConvertCommentsIntoXml_ShouldThrowArgumentNullException_WhenCommentsIsNull()
+        {
+            // Arrange
+            var formatter = new DisqusCommentsFormatter();
+
+            // Act
+            Action action = () => formatter.ConvertCommentsIntoXml(null, "title", new Uri("https://ignas.me"), "pageId");
+
+            // Assert
+            action.ShouldThrow<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void ConvertCommentsIntoXml_ShouldThrowArgumentNullException_WhenPageUrlIsNull()
+        {
+            // Arrange
+            var formatter = new DisqusCommentsFormatter();
+
+            // Act
+            Action action = () => formatter.ConvertCommentsIntoXml(new List<FacebookComment>(), "title", null, "pageId");
+
+            // Assert
+            action.ShouldThrow<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void ConvertCommentsIntoXml_ShouldReturnXml_WhenCommentProvided()
+        {
+            // Arrange
+            XNamespace dsq = "http://www.disqus.com/";
+            XNamespace content = "http://purl.org/rss/1.0/modules/content/";
+            var formatter = new DisqusCommentsFormatter();
+
+            // Act
+            var result = formatter.ConvertCommentsIntoXml(new List<FacebookComment>(), "title", new Uri("https://ignas.me/"), "id");
+
+            // Assert
+            result.Descendants("title").FirstOrDefault().Value.Should().Be("title");
+            result.Descendants("link").FirstOrDefault().Value.Should().Be("https://ignas.me/");
+            result.Descendants(_wp + "post_date_gmt").FirstOrDefault().Value.Should().Be(string.Empty);
+            result.Descendants(_wp + "comment_status").FirstOrDefault().Value.Should().Be("open");
+            result.Descendants(dsq + "thread_identifier").FirstOrDefault().Value.Should().Be("id");
+            result.Descendants(content + "encoded").FirstOrDefault().Value.Should().Be(string.Empty);
         }
     }
 }

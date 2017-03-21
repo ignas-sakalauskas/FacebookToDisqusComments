@@ -7,28 +7,38 @@ namespace FacebookToDisqusComments.DataServices
 {
     public class DisqusCommentsFormatter : IDisqusCommentsFormatter
     {
-        public XDocument ConvertCommentsIntoXml(IList<FacebookComment> comments, string pageTitle, string pageUrl, string pageId)
+        private readonly XNamespace _contentNs = "http://purl.org/rss/1.0/modules/content/";
+        private readonly XNamespace _dsqNs = "http://www.disqus.com/";
+        private readonly XNamespace _dcNs = "http://purl.org/dc/elements/1.1/";
+        private readonly XNamespace _wpNs = "http://wordpress.org/export/1.0/";
+
+        public XDocument ConvertCommentsIntoXml(IList<FacebookComment> comments, string pageTitle, Uri pageUrl, string pageId)
         {
-            XNamespace content = "http://purl.org/rss/1.0/modules/content/";
-            XNamespace dsq = "http://www.disqus.com/";
-            XNamespace dc = "http://purl.org/dc/elements/1.1/";
-            XNamespace wp = "http://wordpress.org/export/1.0/";
+            if (comments == null)
+            {
+                throw new ArgumentNullException(nameof(comments));
+            }
+
+            if (pageUrl == null)
+            {
+                throw new ArgumentNullException(nameof(pageUrl));
+            }
 
             var doc = new XDocument(
                 new XElement("rss",
                     new XAttribute("version", "2.0"),
-                    new XAttribute(XNamespace.Xmlns + "content", content),
-                    new XAttribute(XNamespace.Xmlns + "dsq", dsq),
-                    new XAttribute(XNamespace.Xmlns + "dc", dc),
-                    new XAttribute(XNamespace.Xmlns + "wp", wp),
+                    new XAttribute(XNamespace.Xmlns + "content", _contentNs),
+                    new XAttribute(XNamespace.Xmlns + "dsq", _dsqNs),
+                    new XAttribute(XNamespace.Xmlns + "dc", _dcNs),
+                    new XAttribute(XNamespace.Xmlns + "wp", _wpNs),
                     new XElement("channel",
                         new XElement("item",
                             new XElement("title", pageTitle),
                             new XElement("link", pageUrl),
-                            new XElement(content + "encoded", string.Empty),
-                            new XElement(dsq + "thread_identifier", pageId),
-                            new XElement(wp + "post_date_gmt", string.Empty),
-                            new XElement(wp + "comment_status", "open"),
+                            new XElement(_contentNs + "encoded", string.Empty),
+                            new XElement(_dsqNs + "thread_identifier", pageId),
+                            new XElement(_wpNs + "post_date_gmt", string.Empty),
+                            new XElement(_wpNs + "comment_status", "open"),
                             CreateCommentsList(comments)
                 ))));
 
@@ -46,7 +56,7 @@ namespace FacebookToDisqusComments.DataServices
 
             foreach (var comment in comments)
             {
-                list.Add(CreateComment(comment, "0"));
+                list.Add(CreateComment(comment));
                 if (comment.Children == null)
                 {
                     comment.Children = new List<FacebookComment>();
@@ -68,18 +78,16 @@ namespace FacebookToDisqusComments.DataServices
                 throw new ArgumentNullException(nameof(comment));
             }
 
-            XNamespace wp = "http://wordpress.org/export/1.0/";
-
-            var commentElement = new XElement(wp + "comment",
-                new XElement(wp + "comment_id", comment.Id),
-                new XElement(wp + "comment_author", comment.From.Name),
-                new XElement(wp + "comment_author_email", string.Empty),
-                new XElement(wp + "comment_author_url", string.Empty),
-                new XElement(wp + "comment_author_IP", string.Empty),
-                new XElement(wp + "comment_date_gmt", comment.CreatedTime.ToString("yyyy-MM-dd HH:MM:ss")),
-                new XElement(wp + "comment_content", new XCData(comment.Message)),
-                new XElement(wp + "comment_approved", "1"),
-                new XElement(wp + "comment_parent", parentId)
+            var commentElement = new XElement(_wpNs + "comment",
+                new XElement(_wpNs + "comment_id", comment.Id),
+                new XElement(_wpNs + "comment_author", comment.From.Name),
+                new XElement(_wpNs + "comment_author_email", string.Empty),
+                new XElement(_wpNs + "comment_author_url", string.Empty),
+                new XElement(_wpNs + "comment_author_IP", string.Empty),
+                new XElement(_wpNs + "comment_date_gmt", comment.CreatedTime.ToString("yyyy-MM-dd HH:MM:ss")),
+                new XElement(_wpNs + "comment_content", new XCData(comment.Message)),
+                new XElement(_wpNs + "comment_approved", "1"),
+                new XElement(_wpNs + "comment_parent", parentId)
             );
 
             return commentElement;

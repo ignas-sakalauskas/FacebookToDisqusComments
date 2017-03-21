@@ -41,7 +41,7 @@ namespace FacebookToDisqusComments
                     var comments = await _facebookApi.GetPageComments(accessToken, page.FacebookPageId);
                     Console.WriteLine($"Page '{page.TargetPageTitle}'");
 
-                    var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl.ToString(), page.TargetPageId);
+                    var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl, page.TargetPageId);
 
                     var filePath = Path.Combine(_settings.OutputPath, $"{page.TargetPageTitle}.xml");
                     _fileUtils.SaveAsXml(disqusCommentsXml, filePath);
