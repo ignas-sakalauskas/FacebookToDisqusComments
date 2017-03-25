@@ -18,6 +18,7 @@ namespace FacebookToDisqusComments.ApiWrappers.Dtos
         [JsonProperty("message")]
         public string Message { get; set; }
 
+        [JsonIgnore]
         public List<FacebookComment> Children { get; set; }
     }
 }

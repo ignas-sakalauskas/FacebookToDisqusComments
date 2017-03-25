@@ -8,11 +8,13 @@ namespace FacebookToDisqusComments.ApiWrappers
 {
     public class FacebookCommentsApiWrapper : IFacebookCommentsApiWrapper
     {
+        private readonly IFacebookResponseParser _responseParser;
         private readonly Func<HttpClient> _httpClientFactory;
 
-        public FacebookCommentsApiWrapper(Func<HttpClient> httpClientFactory)
+        public FacebookCommentsApiWrapper(Func<HttpClient> httpClientFactory, IFacebookResponseParser responseParser)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _responseParser = responseParser ?? throw new ArgumentNullException(nameof(responseParser));
         }
 
         public async Task<string> GetAccessToken(string appId, string appSecret)
@@ -78,7 +80,7 @@ namespace FacebookToDisqusComments.ApiWrappers
                     throw new FacebookApiException("Http client response is empty.");
                 }
 
-                var commentsPage = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookCommentsPage>(content);
+                var commentsPage = _responseParser.ParseFacebookCommentsPage(content);
 
                 return commentsPage?.Comments ?? new List<FacebookComment>();
             }
