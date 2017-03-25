@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
@@ -51,7 +52,6 @@ namespace FacebookToDisqusComments.ApiWrappers
             }
         }
 
-        // TODO add children comments population - refer to the POC implementation
         public async Task<IList<FacebookComment>> GetPageCommentsAsync(string accessToken, string pageId)
         {
             if (string.IsNullOrWhiteSpace(accessToken))
@@ -81,8 +81,18 @@ namespace FacebookToDisqusComments.ApiWrappers
                 }
 
                 var commentsPage = _responseParser.ParseFacebookCommentsPage(content);
+                if (commentsPage?.Comments == null || commentsPage.Comments.Any() == false)
+                {
+                    return new List<FacebookComment>();
+                }
 
-                return commentsPage?.Comments ?? new List<FacebookComment>();
+                // Recursive call to retrieve all child comments (replies)
+                foreach (var comment in commentsPage.Comments)
+                {
+                    comment.Children = await GetPageCommentsAsync(accessToken, comment.Id);
+                }
+
+                return commentsPage.Comments;
             }
         }
     }

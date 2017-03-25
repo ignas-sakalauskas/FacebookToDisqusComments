@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -278,6 +279,50 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
 
             // Assert
             result.Should().HaveCount(1);
+        }
+
+        [TestMethod]
+        public async Task GetPageComments_ShouldReturnOneCommentWithOneChild_WhenCommentsListHasOneCommentWithReply()
+        {
+            // Arrange
+            const string commentId = "comment";
+            const string replyId = "reply";
+            var comments = new FacebookCommentsPage
+            {
+                Comments = new List<FacebookComment>
+                {
+                    new FacebookComment
+                    {
+                        Id = commentId
+                    }
+                }
+            };
+
+            var comments2 = new FacebookCommentsPage
+            {
+                Comments = new List<FacebookComment>
+                {
+                    new FacebookComment
+                    {
+                        Id = replyId
+                    }
+                }
+            };
+
+            _httpMockHandler.When(FacebookOkCommentsUrlPattern)
+                .Respond(HttpStatusCode.OK, "application/json", "{}");
+            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>())
+                .Returns(comments, comments2, null); // second call returns reply, and null stops recursion
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+
+            // Act
+            var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
+
+            // Assert
+            result.Should().HaveCount(1);
+            result.FirstOrDefault().Id.Should().Be(commentId);
+            result.FirstOrDefault().Children.Should().HaveCount(1);
+            result.FirstOrDefault().Children.FirstOrDefault().Id.Should().Be(replyId);
         }
     }
 }
