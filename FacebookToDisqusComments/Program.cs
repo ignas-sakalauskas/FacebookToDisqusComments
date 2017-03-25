@@ -27,7 +27,7 @@ namespace FacebookToDisqusComments
             var app = serviceProvider.GetService<Startup>();
 
             // Entry point, async
-            ReturnCodes returnCode = ReturnCodes.Success;
+            var returnCode = ReturnCodes.Success;
             Task.Run(async () => { returnCode = await app.Run(); }).Wait();
 
             Console.WriteLine($"Application has finished with code: {returnCode}");
@@ -47,7 +47,8 @@ namespace FacebookToDisqusComments
             services.AddSingleton<IFacebookCommentsApiWrapper, FacebookCommentsApiWrapper>();
             services.AddSingleton<IDisqusCommentsFormatter, DisqusCommentsFormatter>();
             services.AddSingleton<IFileUtils, FileUtils>();
-            services.AddTransient<Func<HttpClient>>(_ => () => new HttpClient());
+            services.AddSingleton<Func<HttpClient>>(_ => () => new HttpClient());
+            services.AddSingleton<IFacebookResponseParser, FacebookResponseParser>();
         }
     }
 }
