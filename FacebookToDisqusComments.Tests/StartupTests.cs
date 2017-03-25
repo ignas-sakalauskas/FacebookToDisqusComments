@@ -90,7 +90,7 @@ namespace FacebookToDisqusComments.Tests
         public async Task Run_ShouldReturnUnexpectedExceptionCode_WhenExceptionThrown()
         {
             // Arrange
-            _facebookApi.GetAccessToken(Arg.Any<string>(), Arg.Any<string>())
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Throws(new Exception());
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
@@ -108,7 +108,7 @@ namespace FacebookToDisqusComments.Tests
         public async Task Run_ShouldReturnAccessTokenErrorCode_WhenAccessTokenIsInvalid(string accessToken)
         {
             // Arrange
-            _facebookApi.GetAccessToken(Arg.Any<string>(), Arg.Any<string>())
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(accessToken);
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 

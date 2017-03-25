@@ -63,7 +63,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetAccessToken(appId, "secret");
+            Func<Task> action = async () => await wrapper.GetAccessTokenAsync(appId, "secret");
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
@@ -79,7 +79,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetAccessToken("appId", appSecret);
+            Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", appSecret);
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
@@ -94,7 +94,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetAccessToken("appId", "appSecret");
+            Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
@@ -110,7 +110,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetAccessToken("appId", "appSecret");
+            Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
@@ -126,7 +126,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetAccessToken("appId", "appSecret");
+            Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
@@ -142,7 +142,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            var result = await wrapper.GetAccessToken("appId", "appSecret");
+            var result = await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             result.Should().Be("123");
@@ -158,7 +158,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetPageComments(accessToken, "pageId");
+            Func<Task> action = async () => await wrapper.GetPageCommentsAsync(accessToken, "pageId");
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
@@ -174,7 +174,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetPageComments("accessToken", pageId);
+            Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", pageId);
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
@@ -190,7 +190,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetPageComments("accessToken", "pageId");
+            Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
@@ -206,7 +206,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            Func<Task> action = async () => await wrapper.GetPageComments("accessToken", "pageId");
+            Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
@@ -223,7 +223,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            var result = await wrapper.GetPageComments("accessToken", "pageId");
+            var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             result.Should().BeEmpty();
@@ -240,7 +240,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            var result = await wrapper.GetPageComments("accessToken", "pageId");
+            var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             result.Should().BeEmpty();
@@ -257,7 +257,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            var result = await wrapper.GetPageComments("accessToken", "pageId");
+            var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             result.Should().BeEmpty();
@@ -274,7 +274,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
 
             // Act
-            var result = await wrapper.GetPageComments("accessToken", "pageId");
+            var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             result.Should().HaveCount(1);

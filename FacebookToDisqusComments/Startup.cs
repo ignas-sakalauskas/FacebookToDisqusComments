@@ -26,7 +26,7 @@ namespace FacebookToDisqusComments
         {
             try
             {
-                var accessToken = await _facebookApi.GetAccessToken(_settings.AppId, _settings.AppSecret);
+                var accessToken = await _facebookApi.GetAccessTokenAsync(_settings.AppId, _settings.AppSecret);
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
                     Console.WriteLine("Error. Access token was not retrieved.");
@@ -38,7 +38,7 @@ namespace FacebookToDisqusComments
                 var pageItems = _fileUtils.LoadCommentsPageInfo(_settings.InputFilePath);
                 foreach (var page in pageItems)
                 {
-                    var comments = await _facebookApi.GetPageComments(accessToken, page.FacebookPageId);
+                    var comments = await _facebookApi.GetPageCommentsAsync(accessToken, page.FacebookPageId);
                     Console.WriteLine($"Page '{page.TargetPageTitle}'");
 
                     var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl, page.TargetPageId);

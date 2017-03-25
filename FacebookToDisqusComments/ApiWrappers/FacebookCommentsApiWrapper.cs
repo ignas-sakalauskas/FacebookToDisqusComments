@@ -17,7 +17,7 @@ namespace FacebookToDisqusComments.ApiWrappers
             _responseParser = responseParser ?? throw new ArgumentNullException(nameof(responseParser));
         }
 
-        public async Task<string> GetAccessToken(string appId, string appSecret)
+        public async Task<string> GetAccessTokenAsync(string appId, string appSecret)
         {
             const string accessTokenKey = "access_token=";
 
@@ -52,7 +52,7 @@ namespace FacebookToDisqusComments.ApiWrappers
         }
 
         // TODO add children comments population - refer to the POC implementation
-        public async Task<IList<FacebookComment>> GetPageComments(string accessToken, string pageId)
+        public async Task<IList<FacebookComment>> GetPageCommentsAsync(string accessToken, string pageId)
         {
             if (string.IsNullOrWhiteSpace(accessToken))
             {
