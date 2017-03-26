@@ -22,7 +22,7 @@ namespace FacebookToDisqusComments
             _fileUtils = fileUtils ?? throw new ArgumentNullException(nameof(fileUtils));
         }
 
-        public async Task<ReturnCodes> Run()
+        public async Task<ReturnCodes> RunAsync()
         {
             try
             {

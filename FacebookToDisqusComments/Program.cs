@@ -28,7 +28,7 @@ namespace FacebookToDisqusComments
 
             // Entry point, async
             var returnCode = ReturnCodes.Success;
-            Task.Run(async () => { returnCode = await app.Run(); }).Wait();
+            Task.Run(async () => { returnCode = await app.RunAsync(); }).Wait();
 
             Console.WriteLine($"Application has finished with code: {returnCode}");
             Console.WriteLine("Press any key to exit...");

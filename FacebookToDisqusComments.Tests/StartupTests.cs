@@ -95,7 +95,7 @@ namespace FacebookToDisqusComments.Tests
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Act
-           var result = await app.Run();
+           var result = await app.RunAsync();
 
             // Assert
             result.Should().Be(ReturnCodes.UnexpectedError);
@@ -113,7 +113,7 @@ namespace FacebookToDisqusComments.Tests
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Act
-            var result = await app.Run();
+            var result = await app.RunAsync();
 
             // Assert
             result.Should().Be(ReturnCodes.AccessTokenError);
