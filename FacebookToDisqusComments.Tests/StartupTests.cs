@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -7,6 +8,7 @@ using FluentAssertions;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers;
 using FacebookToDisqusComments.DataServices;
+using FacebookToDisqusComments.DataServices.Dtos;
 
 namespace FacebookToDisqusComments.Tests
 {
@@ -134,6 +136,38 @@ namespace FacebookToDisqusComments.Tests
             result.Should().Be(ReturnCodes.AccessTokenError);
         }
 
-        // TODO cover other Run test cases
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnNoCommentsInfoErrorCode_WhenNullReturned()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(null as List<CommentsPageInfo>);
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.NoCommentsInfoError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnNoCommentsInfoErrorCode_WhenNoCommentsLoadedFromFile()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo>());
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.NoCommentsInfoError);
+        }
     }
 }

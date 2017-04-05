@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers;
@@ -36,6 +37,12 @@ namespace FacebookToDisqusComments
                 Console.WriteLine("Access token retrieved.");
 
                 var pageItems = _fileUtils.LoadCommentsPageInfo(_settings.InputFilePath);
+                if (pageItems == null || !pageItems.Any())
+                {
+                    Console.WriteLine($"No input data retrieved from: {_settings.InputFilePath}");
+                    return ReturnCodes.NoCommentsInfoError;
+                }
+
                 foreach (var page in pageItems)
                 {
                     var comments = await _facebookApi.GetPageCommentsAsync(accessToken, page.FacebookPageId);

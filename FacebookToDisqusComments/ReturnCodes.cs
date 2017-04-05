@@ -5,6 +5,7 @@
         UnexpectedError = -1,
         Success = 0,
         AccessTokenError = 1,
-        FacebookApiError = 2
+        FacebookApiError = 2,
+        NoCommentsInfoError = 3
     }
 }
