@@ -50,6 +50,16 @@ namespace FacebookToDisqusComments.DataServices
 
         public string FormatOutputFilePath(string outputFolder, string outputFilename)
         {
+            if (string.IsNullOrWhiteSpace(outputFolder))
+            {
+                throw new ArgumentNullException(nameof(outputFolder));
+            }
+
+            if (string.IsNullOrWhiteSpace(outputFilename))
+            {
+                throw new ArgumentNullException(nameof(outputFilename));
+            }
+
             return Path.Combine(outputFolder, $"{outputFilename}.xml");
         }
     }

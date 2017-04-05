@@ -8,6 +8,6 @@ namespace FacebookToDisqusComments.DataServices
     {
         IList<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath);
         void SaveAsXml(XDocument disqusCommentsXml, string fileName);
-        string FormatOutputFilePath(string settingsOutputPath, string pageTargetPageTitle);
+        string FormatOutputFilePath(string outputFolder, string outputFilename);
     }
 }
