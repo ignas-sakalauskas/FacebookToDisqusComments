@@ -6,6 +6,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using FluentAssertions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FacebookToDisqusComments.ApiWrappers;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
 using FacebookToDisqusComments.DataServices;
@@ -207,6 +208,48 @@ namespace FacebookToDisqusComments.Tests
 
             // Assert
             result.Should().Be(ReturnCodes.FacebookGetCommentsError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnDisqusConvertionErrorCode_WhenNullFacebookCommentsRetrieved()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
+            _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>{new FacebookComment()}));
+            _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
+                .Returns(null as XDocument);
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.DisqusConvertionError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnDisqusConvertionErrorCode_WhenRootNullFacebookCommentsRetrieved()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
+            _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>{new FacebookComment()}));
+            _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
+                .Returns(new XDocument());
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.DisqusConvertionError);
         }
     }
 }

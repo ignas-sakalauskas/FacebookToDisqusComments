@@ -8,5 +8,6 @@
         FacebookGetTokenError = 2,
         NoCommentsInfoError = 3,
         FacebookGetCommentsError = 4,
+        DisqusConvertionError = 5
     }
 }

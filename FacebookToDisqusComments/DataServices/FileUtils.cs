@@ -47,5 +47,10 @@ namespace FacebookToDisqusComments.DataServices
                 disqusCommentsXml.Save(fileStream);
             }
         }
+
+        public string FormatOutputFilePath(string outputFolder, string outputFilename)
+        {
+            return Path.Combine(outputFolder, $"{outputFilename}.xml");
+        }
     }
 }

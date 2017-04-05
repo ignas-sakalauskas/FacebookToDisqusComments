@@ -48,15 +48,20 @@ namespace FacebookToDisqusComments
                     var comments = await _facebookApi.GetPageCommentsAsync(accessToken, page.FacebookPageId);
                     if (comments == null || !comments.Any())
                     {
-                        Console.WriteLine($"No Facebook comments  retrieved.");
+                        Console.WriteLine($"No Facebook comments retrieved.");
                         return ReturnCodes.FacebookGetCommentsError;
                     }
 
                     Console.WriteLine($"Page '{page.TargetPageTitle}'");
 
                     var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl, page.TargetPageId);
+                    if (disqusCommentsXml == null || disqusCommentsXml.Root == null)
+                    {
+                        Console.WriteLine($"Disqus comments convertion failed.");
+                        return ReturnCodes.DisqusConvertionError;
+                    }
 
-                    var filePath = Path.Combine(_settings.OutputPath, $"{page.TargetPageTitle}.xml");
+                    var filePath = _fileUtils.FormatOutputFilePath(_settings.OutputPath, page.TargetPageTitle);
                     _fileUtils.SaveAsXml(disqusCommentsXml, filePath);
                     Console.WriteLine($"Disqus comments saved into: {filePath}");
                 }
