@@ -99,7 +99,7 @@ namespace FacebookToDisqusComments.Tests
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Act
-           var result = await app.RunAsync();
+            var result = await app.RunAsync();
 
             // Assert
             result.Should().Be(ReturnCodes.UnexpectedError);
@@ -114,7 +114,7 @@ namespace FacebookToDisqusComments.Tests
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Act
-           var result = await app.RunAsync();
+            var result = await app.RunAsync();
 
             // Assert
             result.Should().Be(ReturnCodes.FacebookGetTokenError);
@@ -179,7 +179,7 @@ namespace FacebookToDisqusComments.Tests
             _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns("token");
             _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
-                .Returns(new List<CommentsPageInfo>{new CommentsPageInfo()});
+                .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
             _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(Task.FromResult<IList<FacebookComment>>(null));
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
@@ -198,7 +198,7 @@ namespace FacebookToDisqusComments.Tests
             _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns("token");
             _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
-                .Returns(new List<CommentsPageInfo>{new CommentsPageInfo()});
+                .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
             _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>()));
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
@@ -219,7 +219,7 @@ namespace FacebookToDisqusComments.Tests
             _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
                 .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
             _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
-                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>{new FacebookComment()}));
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment> { new FacebookComment() }));
             _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
                 .Returns(null as XDocument);
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
@@ -240,7 +240,7 @@ namespace FacebookToDisqusComments.Tests
             _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
                 .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
             _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
-                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>{new FacebookComment()}));
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment> { new FacebookComment() }));
             _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
                 .Returns(new XDocument());
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
@@ -250,6 +250,30 @@ namespace FacebookToDisqusComments.Tests
 
             // Assert
             result.Should().Be(ReturnCodes.DisqusConvertionError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldCallFormatOutputFilePathAndSaveAsXml_WhenFileSavingSuccessful()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo> { new CommentsPageInfo() });
+            _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment> { new FacebookComment() }));
+            _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
+                .Returns(new XDocument (new XElement("test")));
+            _fileUtils.FormatOutputFilePath(Arg.Any<string>(), Arg.Any<string>());
+            _fileUtils.SaveAsXml(Arg.Any<XDocument>(), Arg.Any<string>());
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.Success);
+            _fileUtils.ReceivedCalls().Should().HaveCount(3);
         }
     }
 }
