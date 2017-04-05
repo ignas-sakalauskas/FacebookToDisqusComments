@@ -4,6 +4,7 @@
     {
         UnexpectedError = -1,
         Success = 0,
-        AccessTokenError = 1
+        AccessTokenError = 1,
+        FacebookApiError = 2
     }
 }

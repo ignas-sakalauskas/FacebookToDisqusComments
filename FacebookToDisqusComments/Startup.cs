@@ -53,7 +53,7 @@ namespace FacebookToDisqusComments
             catch (FacebookApiException ex)
             {
                 Console.WriteLine($"Facebook API error occurred: {ex.Message}");
-                return ReturnCodes.UnexpectedError;
+                return ReturnCodes.FacebookApiError;
             }
             catch (Exception ex)
             {

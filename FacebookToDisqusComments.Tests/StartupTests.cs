@@ -87,7 +87,7 @@ namespace FacebookToDisqusComments.Tests
         }
 
         [TestMethod]
-        public async Task Run_ShouldReturnUnexpectedExceptionCode_WhenExceptionThrown()
+        public async Task RunAsync_ShouldReturnUnexpectedErrorCode_WhenExceptionThrown()
         {
             // Arrange
             _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
@@ -101,11 +101,26 @@ namespace FacebookToDisqusComments.Tests
             result.Should().Be(ReturnCodes.UnexpectedError);
         }
 
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnFacebookApiErrorCode_WhenExceptionThrown()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Throws(new FacebookApiException());
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+           var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.FacebookApiError);
+        }
+
         [DataTestMethod]
         [DataRow(null, DisplayName = "Null")]
         [DataRow("", DisplayName = "Empty")]
         [DataRow(" ", DisplayName = "Whitespace")]
-        public async Task Run_ShouldReturnAccessTokenErrorCode_WhenAccessTokenIsInvalid(string accessToken)
+        public async Task RunAsync_ShouldReturnAccessTokenErrorCode_WhenAccessTokenIsInvalid(string accessToken)
         {
             // Arrange
             _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
