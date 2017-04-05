@@ -7,6 +7,7 @@ using NSubstitute.ExceptionExtensions;
 using FluentAssertions;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers;
+using FacebookToDisqusComments.ApiWrappers.Dtos;
 using FacebookToDisqusComments.DataServices;
 using FacebookToDisqusComments.DataServices.Dtos;
 
@@ -115,7 +116,7 @@ namespace FacebookToDisqusComments.Tests
            var result = await app.RunAsync();
 
             // Assert
-            result.Should().Be(ReturnCodes.FacebookApiError);
+            result.Should().Be(ReturnCodes.FacebookGetTokenError);
         }
 
         [DataTestMethod]
@@ -168,6 +169,44 @@ namespace FacebookToDisqusComments.Tests
 
             // Assert
             result.Should().Be(ReturnCodes.NoCommentsInfoError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnFacebookApiErrorCode_WhenNullFacebookCommentsRetrieved()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo>{new CommentsPageInfo()});
+            _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromResult<IList<FacebookComment>>(null));
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.FacebookGetCommentsError);
+        }
+
+        [TestMethod]
+        public async Task RunAsync_ShouldReturnFacebookApiErrorCode_WhenEmptyListFacebookCommentsRetrieved()
+        {
+            // Arrange
+            _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns("token");
+            _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
+                .Returns(new List<CommentsPageInfo>{new CommentsPageInfo()});
+            _facebookApi.GetPageCommentsAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment>()));
+            var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
+
+            // Act
+            var result = await app.RunAsync();
+
+            // Assert
+            result.Should().Be(ReturnCodes.FacebookGetCommentsError);
         }
     }
 }

@@ -46,6 +46,12 @@ namespace FacebookToDisqusComments
                 foreach (var page in pageItems)
                 {
                     var comments = await _facebookApi.GetPageCommentsAsync(accessToken, page.FacebookPageId);
+                    if (comments == null || !comments.Any())
+                    {
+                        Console.WriteLine($"No Facebook comments  retrieved.");
+                        return ReturnCodes.FacebookGetCommentsError;
+                    }
+
                     Console.WriteLine($"Page '{page.TargetPageTitle}'");
 
                     var disqusCommentsXml = _diqusFormatter.ConvertCommentsIntoXml(comments, page.TargetPageTitle, page.TargetPageUrl, page.TargetPageId);
@@ -60,7 +66,7 @@ namespace FacebookToDisqusComments
             catch (FacebookApiException ex)
             {
                 Console.WriteLine($"Facebook API error occurred: {ex.Message}");
-                return ReturnCodes.FacebookApiError;
+                return ReturnCodes.FacebookGetTokenError;
             }
             catch (Exception ex)
             {
