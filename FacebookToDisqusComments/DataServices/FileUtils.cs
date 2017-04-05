@@ -17,6 +17,10 @@ namespace FacebookToDisqusComments.DataServices
         public IList<CommentsPageInfo> LoadCommentsPageInfo(string inputFilePath)
         {
             var result = new List<CommentsPageInfo>();
+            if (!File.Exists(inputFilePath))
+            {
+                return result;
+            }
 
             var fileLines = File.ReadAllLines(inputFilePath);
             foreach (var line in fileLines)
