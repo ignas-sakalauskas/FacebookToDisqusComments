@@ -256,6 +256,8 @@ namespace FacebookToDisqusComments.Tests
         public async Task RunAsync_ShouldCallFormatOutputFilePathAndSaveAsXml_WhenFileSavingSuccessful()
         {
             // Arrange
+            var saveAsXmlCalled = false;
+            var formatOutputFilePathCalled = false;
             _facebookApi.GetAccessTokenAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns("token");
             _fileUtils.LoadCommentsPageInfo(Arg.Any<string>())
@@ -264,8 +266,8 @@ namespace FacebookToDisqusComments.Tests
                 .Returns(Task.FromResult<IList<FacebookComment>>(new List<FacebookComment> { new FacebookComment() }));
             _disqusFormatter.ConvertCommentsIntoXml(Arg.Any<List<FacebookComment>>(), Arg.Any<string>(), Arg.Any<Uri>(), Arg.Any<string>())
                 .Returns(new XDocument (new XElement("test")));
-            _fileUtils.FormatOutputFilePath(Arg.Any<string>(), Arg.Any<string>());
-            _fileUtils.SaveAsXml(Arg.Any<XDocument>(), Arg.Any<string>());
+            _fileUtils.When(s => s.FormatOutputFilePath(Arg.Any<string>(), Arg.Any<string>())).Do(x => formatOutputFilePathCalled = true);
+            _fileUtils.When(s => s.SaveAsXml(Arg.Any<XDocument>(), Arg.Any<string>())).Do(x => saveAsXmlCalled = true);
             var app = new Startup(_settings, _facebookApi, _disqusFormatter, _fileUtils);
 
             // Act
@@ -273,6 +275,8 @@ namespace FacebookToDisqusComments.Tests
 
             // Assert
             result.Should().Be(ReturnCodes.Success);
+            saveAsXmlCalled.Should().BeTrue();
+            formatOutputFilePathCalled.Should().BeTrue();
             _fileUtils.ReceivedCalls().Should().HaveCount(3);
         }
     }
