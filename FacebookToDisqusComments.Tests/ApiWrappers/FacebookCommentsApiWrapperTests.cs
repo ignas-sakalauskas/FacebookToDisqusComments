@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
+using FacebookToDisqusComments.DataServices;
 using NSubstitute;
 
 namespace FacebookToDisqusComments.Tests.ApiWrappers
@@ -18,7 +19,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
     {
         private Func<HttpClient> _httpClientFactory;
         private MockHttpMessageHandler _httpMockHandler;
-        private IFacebookResponseParser _responseParser;
+        private IJsonParser _jsonParser;
 
         private const string FacebookOkCommentsUrlPattern = "https://graph.facebook.com/comments*";
 
@@ -27,7 +28,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         {
             _httpMockHandler = new MockHttpMessageHandler();
             _httpClientFactory = () => _httpMockHandler.ToHttpClient();
-            _responseParser = Substitute.For<IFacebookResponseParser>();
+            _jsonParser = Substitute.For<IJsonParser>();
         }
 
         [TestMethod]
@@ -36,7 +37,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             // Act
             // ReSharper disable once ObjectCreationAsStatement
-            Action action = () => new FacebookCommentsApiWrapper(null, _responseParser);
+            Action action = () => new FacebookCommentsApiWrapper(null, _jsonParser);
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
@@ -61,7 +62,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         public void GetAccessToken_ShouldThrowArgumentNullException_WhenAppIdIsInvalid(string appId)
         {
             // Arrange
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetAccessTokenAsync(appId, "secret");
@@ -77,7 +78,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         public void GetAccessToken_ShouldThrowArgumentNullException_WhenAppSecretIsInvalid(string appSecret)
         {
             // Arrange
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", appSecret);
@@ -92,7 +93,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When("*")
                 .Respond(HttpStatusCode.InternalServerError, "application/json", string.Empty);
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
@@ -108,45 +109,53 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When("*")
                 .Respond(HttpStatusCode.OK, "application/json", string.Empty);
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
-                .And.Message.Should().Be("Http client response doesn't contain access token.");
+                .And.Message.Should().Be("Http client response was empty.");
         }
 
         [TestMethod]
-        public void GetAccessToken_ShouldThrowFacebookApiException_WhenClientReponseContentDoesNotContainKey()
+        public void GetAccessToken_ShouldThrowFacebookApiException_WhenClientReponseParsingReturnsNull()
         {
             // Arrange
             _httpMockHandler.When("*")
-                .Respond(HttpStatusCode.OK, "application/json", "nokeycontent");
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+                .Respond(HttpStatusCode.OK, "application/json", "content");
+            _jsonParser.ParseJsonResponse<FacebookAccessToken>(Arg.Any<string>())
+                .Returns(null as FacebookAccessToken);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
             action.ShouldThrow<FacebookApiException>()
-                .And.Message.Should().Be("Http client response doesn't contain access token.");
+                .And.Message.Should().Be("Token parsing failed.");
         }
 
         [TestMethod]
         public async Task GetAccessToken_ShouldReturnAccessToken_WhenClientReponseContentContainsAccessToken()
         {
             // Arrange
+            const string accessToken = "123";
             _httpMockHandler.When("https://graph.facebook.com/oauth/access_token*")
-                .Respond(HttpStatusCode.OK, "application/json", "access_token=123");
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+                .Respond(HttpStatusCode.OK, "application/json", "content");
+            _jsonParser.ParseJsonResponse<FacebookAccessToken>(Arg.Any<string>())
+                .Returns(new FacebookAccessToken
+                {
+                    AccessToken = accessToken
+                });
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetAccessTokenAsync("appId", "appSecret");
 
             // Assert
-            result.Should().Be("123");
+            result.Should().Be(accessToken);
         }
 
         [DataTestMethod]
@@ -156,7 +165,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         public void GetPageComments_ShouldThrowArgumentNullException_WhenAccessTokenIsInvalid(string accessToken)
         {
             // Arrange
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetPageCommentsAsync(accessToken, "pageId");
@@ -172,7 +181,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         public void GetPageComments_ShouldThrowArgumentNullException_WhenPageIdIsInvalid(string pageId)
         {
             // Arrange
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", pageId);
@@ -188,7 +197,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When("*")
                 .Respond(HttpStatusCode.InternalServerError, "application/json", string.Empty);
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", "pageId");
@@ -204,7 +213,7 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", string.Empty);
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             Func<Task> action = async () => await wrapper.GetPageCommentsAsync("accessToken", "pageId");
@@ -220,8 +229,8 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", "{}");
-            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>()).Returns(null as FacebookCommentsPage);
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            _jsonParser.ParseJsonResponse<FacebookCommentsPage>(Arg.Any<string>()).Returns(null as FacebookCommentsPage);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
@@ -236,9 +245,9 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", "{}");
-            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>())
+            _jsonParser.ParseJsonResponse<FacebookCommentsPage>(Arg.Any<string>())
                 .Returns(new FacebookCommentsPage { Comments = null });
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
@@ -253,9 +262,9 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
             // Arrange
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", "{}");
-            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>())
+            _jsonParser.ParseJsonResponse<FacebookCommentsPage>(Arg.Any<string>())
                 .Returns(new FacebookCommentsPage { Comments = new List<FacebookComment>() });
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
@@ -268,17 +277,26 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         public async Task GetPageComments_ShouldReturnOneComment_WhenCommentsListHasOneComment()
         {
             // Arrange
+            var comments = new FacebookCommentsPage
+            {
+                Comments = new List<FacebookComment>
+                {
+                    new FacebookComment {Id = "id"}
+                }
+            };
+
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", "{}");
-            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>())
-                .Returns(new FacebookCommentsPage { Comments = new List<FacebookComment> { new FacebookComment() } });
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            _jsonParser.ParseJsonResponse<FacebookCommentsPage>(Arg.Any<string>())
+                .Returns(comments, null, null); // null stops recursion
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");
 
             // Assert
             result.Should().HaveCount(1);
+            result.FirstOrDefault().Children.Should().BeEmpty();
         }
 
         [TestMethod]
@@ -311,9 +329,9 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
 
             _httpMockHandler.When(FacebookOkCommentsUrlPattern)
                 .Respond(HttpStatusCode.OK, "application/json", "{}");
-            _responseParser.ParseFacebookCommentsPage(Arg.Any<string>())
+            _jsonParser.ParseJsonResponse<FacebookCommentsPage>(Arg.Any<string>())
                 .Returns(comments, comments2, null); // second call returns reply, and null stops recursion
-            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _responseParser);
+            var wrapper = new FacebookCommentsApiWrapper(_httpClientFactory, _jsonParser);
 
             // Act
             var result = await wrapper.GetPageCommentsAsync("accessToken", "pageId");

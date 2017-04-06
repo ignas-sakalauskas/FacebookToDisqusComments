@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FacebookToDisqusComments.ApiWrappers;
+using FacebookToDisqusComments.DataServices;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,58 +14,58 @@ namespace FacebookToDisqusComments.Tests.ApiWrappers
         [DataRow(null, DisplayName = "Null")]
         [DataRow("", DisplayName = "Empty")]
         [DataRow(" ", DisplayName = "Whitespace")]
-        public void ParseFacebookCommentsPage_ShouldThrowArgumentNullException_WhenContentIsInvalid(string content)
+        public void ParseJsonResponse_ShouldThrowArgumentNullException_WhenContentIsInvalid(string content)
         {
             // Arrange
-            var parser = new FacebookResponseParser();
+            var parser = new JsonParser();
 
             // Act
-            Action action = () => parser.ParseFacebookCommentsPage(content);
+            Action action = () => parser.ParseJsonResponse<FacebookCommentsPage>(content);
 
             // Assert
             action.ShouldThrow<ArgumentNullException>();
         }
 
         [TestMethod]
-        public void ParseFacebookCommentsPage_ShouldReturnNull_WhenContentIsEmptyJsonObject()
+        public void ParseJsonResponse_ShouldReturnNull_WhenContentIsEmptyJsonObject()
         {
             // Arrange
             const string json = "{}";
-            var parser = new FacebookResponseParser();
+            var parser = new JsonParser();
 
             // Act
-            var result = parser.ParseFacebookCommentsPage(json);
+            var result = parser.ParseJsonResponse<FacebookCommentsPage>(json);
 
             // Assert
             result.Comments.Should().BeNull();
         }
 
         [TestMethod]
-        public void ParseFacebookCommentsPage_ShouldReturnEmptyCommentsList_WhenDataIsEmpty()
+        public void ParseJsonResponse_ShouldReturnEmptyCommentsList_WhenDataIsEmpty()
         {
             // Arrange
             const string json = "{data:[]}";
-            var parser = new FacebookResponseParser();
+            var parser = new JsonParser();
 
             // Act
-            var result = parser.ParseFacebookCommentsPage(json);
+            var result = parser.ParseJsonResponse<FacebookCommentsPage>(json);
 
             // Assert
             result.Comments.Should().BeEmpty();
         }
 
         [TestMethod]
-        public void ParseFacebookCommentsPage_ShouldReturnTwoCommentsWith_WhenClientReponseContentContainsThreeComments()
+        public void ParseJsonResponse_ShouldReturnTwoCommentsWith_WhenClientReponseContentContainsThreeComments()
         {
             // Arrange
-            var parser = new FacebookResponseParser();
+            var parser = new JsonParser();
             var expectedPage = new FacebookCommentsPage
             {
                 Comments = GetFakeCommentsList()
             };
 
             // Act
-            var result = parser.ParseFacebookCommentsPage(GetFakeCommentsJson());
+            var result = parser.ParseJsonResponse<FacebookCommentsPage>(GetFakeCommentsJson());
 
             // Assert
             result.ShouldBeEquivalentTo(expectedPage);

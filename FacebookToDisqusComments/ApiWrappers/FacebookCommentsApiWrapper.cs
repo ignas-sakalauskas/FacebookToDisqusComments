@@ -4,24 +4,23 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FacebookToDisqusComments.ApiWrappers.Dtos;
+using FacebookToDisqusComments.DataServices;
 
 namespace FacebookToDisqusComments.ApiWrappers
 {
     public class FacebookCommentsApiWrapper : IFacebookCommentsApiWrapper
     {
-        private readonly IFacebookResponseParser _responseParser;
+        private readonly IJsonParser _jsonParser;
         private readonly Func<HttpClient> _httpClientFactory;
 
-        public FacebookCommentsApiWrapper(Func<HttpClient> httpClientFactory, IFacebookResponseParser responseParser)
+        public FacebookCommentsApiWrapper(Func<HttpClient> httpClientFactory, IJsonParser jsonParser)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-            _responseParser = responseParser ?? throw new ArgumentNullException(nameof(responseParser));
+            _jsonParser = jsonParser ?? throw new ArgumentNullException(nameof(jsonParser));
         }
 
         public async Task<string> GetAccessTokenAsync(string appId, string appSecret)
         {
-            const string accessTokenKey = "access_token=";
-
             if (string.IsNullOrWhiteSpace(appId))
             {
                 throw new ArgumentNullException(nameof(appId));
@@ -43,12 +42,18 @@ namespace FacebookToDisqusComments.ApiWrappers
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-                if (!content.Contains(accessTokenKey))
+                if (string.IsNullOrWhiteSpace(content))
                 {
-                    throw new FacebookApiException("Http client response doesn't contain access token.");
+                    throw new FacebookApiException("Http client response was empty.");
                 }
 
-                return content.Replace(accessTokenKey, string.Empty);
+                var tokenObject = _jsonParser.ParseJsonResponse<FacebookAccessToken>(content);
+                if (tokenObject == null)
+                {
+                    throw new FacebookApiException("Token parsing failed.");
+                }
+
+                return tokenObject.AccessToken;
             }
         }
 
@@ -80,7 +85,7 @@ namespace FacebookToDisqusComments.ApiWrappers
                     throw new FacebookApiException("Http client response is empty.");
                 }
 
-                var commentsPage = _responseParser.ParseFacebookCommentsPage(content);
+                var commentsPage = _jsonParser.ParseJsonResponse<FacebookCommentsPage>(content);
                 if (commentsPage?.Comments == null || commentsPage.Comments.Any() == false)
                 {
                     return new List<FacebookComment>();

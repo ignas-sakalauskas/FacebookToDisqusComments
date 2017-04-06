@@ -48,7 +48,7 @@ namespace FacebookToDisqusComments
             services.AddSingleton<IDisqusCommentsFormatter, DisqusCommentsFormatter>();
             services.AddSingleton<IFileUtils, FileUtils>();
             services.AddSingleton<Func<HttpClient>>(_ => () => new HttpClient());
-            services.AddSingleton<IFacebookResponseParser, FacebookResponseParser>();
+            services.AddSingleton<IJsonParser, JsonParser>();
         }
     }
 }
